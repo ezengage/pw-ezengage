@@ -48,14 +48,16 @@ else{
         //否则显示将界面要求登录或注册
         else{
             if($ezengage_config['enable_auto_register']){
+                //always error
+                Cookie('eze_auto_register_error', 1);
                 $winduid = eze_register_user($profile);
                 if($winduid){
                     eze_bind($winduid, $profile, TRUE);
+                    Cookie('eze_token', '', 0);
+                    //we have no error
+                    Cookie('eze_auto_register_error', '', 0);
                     header("Location: index.php");
                 }
-                #showmessage('login_succeed', $_G['gp_refer'], 
-                #    array('username' => $_G['member']['username'],'uid' => $winduid)
-                #);
             }
             else{
                 header("Location: register.php");

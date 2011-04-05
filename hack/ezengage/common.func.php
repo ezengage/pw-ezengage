@@ -100,10 +100,11 @@ function eze_register_user($profile){
 
     $regname = $profile['preferred_username'];
 
-    $name_check = $db->get_value('SELECT COUNT(*) AS count FROM pw_members WHERE username LIKE ' . S::sqlEscape("$regname%"));
-    if($name_check > 0){
-        $regname = $regname . "" . $name_check;
-    }
+    //DON'T AUTO SET USERNAME
+    //$name_check = $db->get_value('SELECT COUNT(*) AS count FROM pw_members WHERE username LIKE ' . S::sqlEscape("$regname%"));
+    //if($name_check > 0){
+    //    $regname = $regname . "" . $name_check;
+    //}
 
 	$ret = $register->checkSameNP($regname, $regpwd);
 
@@ -168,15 +169,6 @@ function eze_register_user($profile){
 		require_once(R_P.'require/passport_server.php');
 	}
     return $winduid;
-}
-
-function eze_on_bind_shutdown(){
-    global $ezengage_config;
-    global $winduid;
-    global $profile;
-    if(!$winduid && !$profile['uid']){
-        Cookie('eze_fail_auto_register', 1);
-    }
 }
 
 function eze_login_widget($style = 'normal', $width = 'auto', $height = 'auto'){
@@ -257,6 +249,17 @@ function eze_bind($winduid, $profile, $send_pm = FALSE){
         ));
         Cookie('eze_token', '', 0);
     }
+}
+
+function eze_current_profile(){
+    global $db;
+    $token = GetCookie('eze_token');
+    if(!$token){
+        return NULL;
+    }
+    $escaped_token = S::sqlEscape($token);
+    $profile = $db->fetch_array($db->query("SELECT * FROM pw_eze_profile WHERE token={$escaped_token}"));
+    return $profile;
 }
 
 class eze_publisher {

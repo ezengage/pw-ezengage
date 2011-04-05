@@ -1,4 +1,8 @@
 <?php
+if(!$winduid){
+    Showmsg('请先登录');
+    exit();
+}
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	require_once(D_P.'data/bbscache/ezengage_config.php');
     require_once(R_P.'hack/ezengage/common.func.php');
@@ -39,12 +43,3 @@ else if (empty($action)) {
     require_once PrintHack('index');footer();
     exit;
 }
-#elseif($action=='submit'){
-#	InitGP(array('ezengage_config'),'P');
-#	$value=serialize($ezengage_config);
-#    updatemysql($value);
-#    updatecache_rr();
-#	adminmsg('operate_success');
-#}
-#*/
-
