@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS `pw_eze_profile` (
+  `pid` mediumint(8) NOT NULL auto_increment,
+  `token` varchar(50) NOT NULL,
+  `uid` mediumint(8) unsigned NOT NULL default '0',
+  `identity` varchar(255) NOT NULL,
+  `provider_code` varchar(15) NOT NULL,
+  `provider_name` varchar(50) NOT NULL,
+  `preferred_username` varchar(100) NOT NULL default '',
+  `sync_list` varchar(100) NOT NULL default '',
+  PRIMARY KEY  (`pid`),
+  UNIQUE KEY `token` (`token`),
+  UNIQUE KEY `identity` (`identity`),
+  KEY `uid` (`uid`)
+) ENGINE=MyISAM;
