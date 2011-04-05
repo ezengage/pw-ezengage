@@ -30,7 +30,7 @@ else if($_GET['mod'] == 'js'){
                 echo "window.location.href='register.php';";
             }
         }
-        if($_GET['scr'] == 'register'){
+        elseif($_GET['scr'] == 'register'){
             require_once(R_P.'hack/ezengage/common.func.php');
             require_once(R_P. "hack/ezengage/lang.$db_charset.php");
             $profile = eze_current_profile();
@@ -49,6 +49,31 @@ else if($_GET['mod'] == 'js'){
                 }";
                 echo $js;
             }
+        }
+        elseif($_GET['scr'] == 'login'){
+            
+        }
+        else {
+            require_once(R_P.'hack/ezengage/common.func.php');
+            $html = "<div id='eze_footer_wrap' style=\"display:none;position:absolute;right:480px;top:45px\">"
+                    . eze_login_widget('tiny', 150, 54)
+                    . "</div>";
+            $js = sprintf(
+                "try{
+                var _eze_html = '%s';
+                var _ele = document.createElement('div');
+                _ele.innerHTML = _eze_html;
+                document.body.appendChild(_ele);
+                var _banner = document.getElementById('banner');
+                var _form = _banner.getElementsByTagName('form').item(0);    
+                _eze_login = document.getElementById('eze_footer_wrap');
+                _banner.insertBefore(_eze_login, _form); 
+                _eze_login.style.display = '';
+                }catch(e){}
+                ",
+                addslashes($html)
+            );
+            echo $js;
         }
     }
 }
