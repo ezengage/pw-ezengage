@@ -5,6 +5,7 @@
 */
 
 include_once realpath(dirname(__FILE__)). '/common.func.php';
+include_once realpath(dirname(__FILE__)). "/lang.$db_charset.php";
 
 $token = GetCookie('eze_token');
 
@@ -14,19 +15,17 @@ $profile = $db->fetch_array($db->query("SELECT * FROM pw_eze_profile WHERE token
 //找不到profile,说明cookie 不正确或已经过期，提示用户
 if(!$profile){
     if($winduid){
-        exit('bad request');
-        #showmessage('ezengage:bad_request', EZE_MY_ACCOUNT_URL);
+        refreshto(EZE_MY_ACCOUNT_URL, $eze_scriptlang['bad_request'], 3);
     }
     else {
-        exit('bad request');
-        #showmessage('ezengage:bad_request', 'index.php');
+        refreshto('index.php', $eze_scriptlang['bad_request'], 3);
     }
 }
 else{
     if($profile['uid'] > 0){
         if($winduid && $profile['uid'] != $winduid){
             Cookie('eze_token', '', 0);
-            #showmessage('ezengage:already_bind_to_other_user', EZE_MY_ACCOUNT_URL);
+            refreshto(EZE_MY_ACCOUNT_URL, $eze_scriptlang['already_bind_to_other_user'], 3);
         }
         else {
             if(eze_login_user($profile['uid'])){
@@ -34,7 +33,7 @@ else{
                 header("location:index.php");
             }
             else{
-                showmessage('ezengage:login_fail', 'member.php?mod=logging&action=login');
+                refreshto('login.php', $eze_scriptlang['login_fail'], 3);
             }
         } 
     }
@@ -61,7 +60,6 @@ else{
             }
             else{
                 header("Location: register.php");
-                #header("location: member.php?mod=register&referer=" .urlencode(EZE_MY_ACCOUNT_URL));
             }
         }
     }

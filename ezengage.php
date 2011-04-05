@@ -35,7 +35,8 @@ else if($_GET['mod'] == 'js'){
             require_once(R_P. "hack/ezengage/lang.$db_charset.php");
             $profile = eze_current_profile();
             $is_auto_register_error = GetCookie('eze_auto_register_error');
-            if($profile && $is_auto_register_error){
+            //auto register fail or disabled
+            if($profile && ($is_auto_register_error || !$ezengage_config['enable_auto_register'])){
                 $html = $eze_scriptlang['register_notice'];
                 foreach(array('provider_name', 'preferred_username') as $item){
                     $html = str_replace('%(' . $item .  ')s', $profile[$item], $html);

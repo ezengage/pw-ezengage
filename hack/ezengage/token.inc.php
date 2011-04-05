@@ -11,18 +11,20 @@ include_once realpath(dirname(__FILE__)). "/lang.$db_charset.php";
 $eze_app_key = $ezengage_config['app_key'];
 
 if(empty($eze_app_key)){
-    exit('Bad Configuration');
+    Showmsg($eze_scriptlang['bad_config']);
+    exit();
 }
 
 $ezeApiClient = new EzEngageApiClient($eze_app_key);
 if(empty($_POST['token'])){
-    exit('fail to login, please check your ezengage configuration.');
+    Showmsg($eze_scriptlang['bad_request']);
+    exit();
 }
 
 //may be do some basic check
 $profile = $ezeApiClient->getProfile(strval($_POST['token']));
 if(!$profile){
-    Showmsg($eze_scriptlang['eze_login_fail'], 'index.php');
+    Showmsg($eze_scriptlang['login_fail']);
     exit();
 }
 

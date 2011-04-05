@@ -3,9 +3,12 @@ if(!$winduid){
     Showmsg('请先登录');
     exit();
 }
+
+require_once(D_P.'data/bbscache/ezengage_config.php');
+require_once(R_P.'hack/ezengage/common.func.php');
+require_once(R_P."hack/ezengage/lang.$db_charset.php");
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-	require_once(D_P.'data/bbscache/ezengage_config.php');
-    require_once(R_P.'hack/ezengage/common.func.php');
     if($_POST['action'] == 'save'){
         if(!empty($_POST['delete']) && is_array($_POST['delete'])) {
             $to_delete = array();
@@ -23,23 +26,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $eze_profiles = eze_get_profiles($winduid);
         foreach($eze_profiles as &$profile){
             if(is_array($_POST['sync_list_' . $profile['pid']])){
-            $sync_list = implode(',', $_POST['sync_list_' . $profile['pid']]); 
+                $sync_list = implode(',', $_POST['sync_list_' . $profile['pid']]); 
             }
             else{
-            $sync_list = '';
+                $sync_list = '';
             }
             $profile['sync_list'] = $sync_list;
             $e_sync_list = S::sqlEscape($sync_list);
             $db->update("UPDATE pw_eze_profile SET sync_list = $e_sync_list WHERE uid='$winduid' AND pid=$profile[pid];");
         }
-        Showmsg('保存成功');
+        refreshto(EZE_MY_ACCOUNT_URL, $eze_scriptlang['updateuser_succeed']);
     }
 }
 else if (empty($action)) {
-	include_once(D_P.'data/bbscache/ezengage_config.php');
-    require_once(R_P.'hack/ezengage/common.func.php');
     $eze_profiles = eze_get_profiles($winduid);
-	#ifcheck($ezengage_config['open'], 'open');
     require_once PrintHack('index');footer();
     exit;
 }
