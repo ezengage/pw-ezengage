@@ -12,9 +12,6 @@ define(EZE_MY_ACCOUNT_URL, 'hack.php?H_name=ezengage');
 
 global $hack_name;
 
-global $_G;
-$_G['charset'] = $db_charset;
-
 //转换编码
 function eze_convert($source, $in, $out){
     $in = strtoupper($in);
@@ -37,7 +34,6 @@ function eze_convert($source, $in, $out){
 
 //过滤
 function eze_filter($content) {
-    global $_G;
     //attach 
     $content = preg_replace('!\[(attachimg|attach)\]([^\[]+)\[/(attachimg|attach)\]!', '', $content);
     //image
@@ -48,10 +44,8 @@ function eze_filter($content) {
         $content = preg_replace($re, '\2', $content);
     }
     //smiles
-    $re = isset($_G['cache']['smileycodes']) ? (array)$_G['cache']['smileycodes'] : array();
-    $smiles_searcharray = isset($_G['cache']['smilies']['searcharray']) ? (array)$_G['cache']['smilies']['searcharray'] : array();
-    $content = str_replace($re, '', $content);
-    $content = preg_replace($smiles_searcharray, '', $content);
+    $content = preg_replace('/\[s:\d+\]/', '', $content);
+    $content = str_replace("&nbsp;", ' ', $content);
     return $content;
 }
 
@@ -234,10 +228,11 @@ function eze_sync_list_output($profile){
 }
 
 function eze_get_default_sync_to($uid, $event){
-    $event = mysql_real_escape_string($event);
-    $query = DB::query("SELECT pid FROM " . DB::table('eze_profile') . " WHERE uid='$uid' AND sync_list LIKE '%$event%'");
+    global $db;
+    $e_event = S::sqlEscape('%' . $event . '%');
+    $query = $db->query("SELECT pid FROM pw_eze_profile WHERE uid='$uid' AND sync_list LIKE $e_event");
     $pids = array();
-    while($profile = DB::fetch($query)) {
+    while($profile = $db->fetch_array($query)) {
         $pids[] = $profile['pid'];
     }
     return $pids;
@@ -253,79 +248,53 @@ function eze_get_profiles($uid){
     return $eze_profiles;
 }
 
-function eze_current_profile(){
-    global $_G;
-    if(empty($_G['cookie']['eze_token'])){
-        return NULL;
-    }
-    $token = authcode($_G['cookie']['eze_token'], 'DECODE');
-    if(empty($token)){
-        return NULL;
-    }
-    $escaped_token = mysql_real_escape_string($token);
-    $profile = DB::fetch_first("SELECT * FROM " . DB::table('eze_profile') ." WHERE token='{$escaped_token}'");
-    return $profile;
-}
-
 function eze_bind($winduid, $profile, $send_pm = FALSE){
     global $db;
-    //include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
-    //$lang = $scriptlang['ezengage'];
-
     if($winduid && $profile && !$profile['uid']){
         $ret = $db->query(sprintf(
             "UPDATE pw_eze_profile SET uid = %d WHERE pid = %d",
             $winduid, $profile['pid']
         ));
         Cookie('eze_token', '', 0);
-        /*
-        if($send_pm){
-            $replaces = array(
-                '{siteurl}' => $_G['siteurl'],
-                '{provider_name}' => $profile['provider_name'],
-                '{preferred_username}' => $profile['preferred_username'],
-            );
-            $subject = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_subject']));
-            $message = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_message']));
-            sendpm($_G['uid'], $subject, $message, 0);
-        }
-        */
     }
 }
 
 class eze_publisher {
 
     //同步主题
-    static function sync_newthread($pid, $sync_to){
-       self::sync_post($pid, $sync_to); 
+    static function sync_newthread($tid, $sync_to){
+        global $db;
+        $e_tid = S::sqlEscape($tid);
+        $thread = $db->fetch_array($db->query("SELECT tid, authorid, subject FROM pw_threads WHERE tid={$e_tid};"));
+        if(!$thread){
+            return;
+        }
+        $uid = $thread['authorid'];
+        $status = self::format_thread_status($thread);
+        self::publish($uid, $sync_to, $status);
     }
 
     //同步回复
     static function sync_reply($pid, $sync_to){
-       self::sync_post($pid, $sync_to); 
-    }
-
-    //同步主题或回复
-    static function sync_post($pid, $sync_to){
-        $post = DB::fetch_first("SELECT tid,pid,authorid,subject,message,first FROM " . DB::table('forum_post') . " WHERE pid={$pid};");
+        global $db;
+        $e_pid = S::sqlEscape($pid);
+        $post = $db->fetch_array($db->query(
+            "SELECT tid, pid, authorid, subject, content FROM pw_posts WHERE pid={$e_pid};"));
         if(!$post){
             return;
         }
         $uid = $post['authorid'];
-        $status = self::format_post_status($post);
+        $status = self::format_reply_status($post);
         self::publish($uid, $sync_to, $status);
-    } 
+    }
 
-    static function format_post_status($post){
-        global $_G;
-        if($post['first']){
-            $url = $_G['siteurl'] . "forum.php?mod=viewthread&tid=$post[tid]";
-        }
-        else{
-            $url = $_G['siteurl'] . "forum.php?mod=redirect&goto=findpost&pid=$post[pid]&ptid=$post[tid]";
-        }
-        $status = $post['subject'] . ' ' . $post['message'];
-        $status = eze_convert($status, $_G['charset'], 'UTF-8');
+    static function format_thread_status($thread){
+        global $db_bbsurl;
+        global $db_charset;
+
+        $url = $db_bbsurl . "/read.php?tid=$thread[tid]";
+        $status = $thread['subject'];
+        $status = eze_convert($status, $db_charset, 'UTF-8');
         $status = eze_filter($status);
         $status = $url . ' ' . $status;
         #这里的截断只是为了防止大文章时发送过大的数据。
@@ -333,24 +302,25 @@ class eze_publisher {
         return $status;
     }
 
-    //同步记录
-    static function sync_newdoing($doid, $sync_to){
-        $doing = DB::fetch_first("SELECT uid,doid,message FROM " . DB::table('home_doing') . " WHERE doid={$doid};");
-        if(!$doing){
-            return;
-        }
-        $status = self::format_doing_status($doing);
-        self::publish($doing['uid'], $sync_to, $status);
-    }
+    static function format_reply_status($post){
+        global $db_bbsurl, $db_readperpage;
+        global $db, $db_charset;
 
-    static function format_doing_status($doing){
-        global $_G;
-        $status = eze_convert($doing['message'], $_G['charset'], 'UTF-8');
+        #MAY BUGGY
+        $floor = $db->get_value("SELECT COUNT(pid) AS floor FROM pw_posts WHERE tid = $post[tid] AND pid <= $post[pid]");
+        $page = ceil(($floor)/$db_readperpage);
+
+        $url = $db_bbsurl . "/read.php?tid=$post[tid]&page=$page#".$post['pid'];
+        $status = $post['subject'] . ' ' . $post['content'];
+        $status = eze_convert($status, $db_charset, 'UTF-8');
         $status = eze_filter($status);
+        $status = $url . ' ' . $status;
+        #这里的截断只是为了防止大文章时发送过大的数据。
         $status = substr($status, 0, 1000);
         return $status;
     }
 
+    /*
     //同步Blog
     static function sync_newblog($blogid, $sync_to){
         $blog = DB::fetch_first("SELECT blogid,uid,subject FROM " . DB::table('home_blog') . " WHERE blogid={$blogid}");
@@ -370,110 +340,23 @@ class eze_publisher {
         $status = substr($status, 0, 1000);
         return $status;
     }
-
-    //同步Share
-    static function sync_newshare($sid, $sync_to){
-        $share = DB::fetch_first("SELECT * FROM " . DB::table('home_share') . " WHERE sid={$sid}");
-        $status = self::format_share_status($share);
-        if(!empty($status)){
-            self::publish($share['uid'], $sync_to, $status);
-        }
-    }
-
-    static function format_share_status($share){
-        global $_G;
-        $type_map = array(
-            'space' => 'username',
-			'blog' => 'subject',
-			'album' => 'albumname',
-			'pic' => 'albumname',
-			'thread' => 'subject',
-			'article' => 'title',
-			'link' => 'link',
-			'video' => 'link',
-			'music' => 'link',
-			'flash' => 'link',
-		);
-        $t = $type_map[$share['type']];
-        if(empty($t)){
-            return false;
-        }
-
-		$body_data = unserialize($share['body_data']);
-		if('link' != $t){
-            //如果分享的是站内的内容，把链接提取出来
-			$pattern = '/^<a[ ]+href[ ]*=[ ]*"([a-zA-Z0-9\/\\\\@:%_+.~#*?&=\-]+)"[ ]*>(.+)<\/a>$/';
-			preg_match($pattern, $body_data[$t], $match);
-			if(count($match) !== 3){
-				return false;
-			}
-			$link = $_G['siteurl']. $match[1];
-			$title = ('pic' == $t) ? $body_data['title'] : $match[2];
-		}else{
-			$link = $body_data['data'];
-		}
-		
-		$status = !empty($share['body_general']) ? $share['body_general'] : $body_data['title_template'];
-
-		if(!empty($title)){
-            $status .= '  '. strval($title);
-        }
-        $status = $link . ' ' . $status;
-
-        $status = eze_convert($status, $_G['charset'], 'UTF-8');
-        $status = eze_filter($status);
-        $status = substr($status, 0, 1000);
-        return $status;
-    }
-
-    static function sync_comment($cid, $sync_to){
-        $comment = DB::fetch_first("SELECT cid,uid,idtype,id,authorid,message FROM " . DB::table('home_comment')  . " WHERE cid = $cid ");
-        $status = self::format_comment_status($comment);
-        self::publish($comment['authorid'], $sync_to, $status);
-    }
-
-    static function format_comment_status($comment){
-        global $_G;
-        switch($comment['idtype']){
-            case 'blogid':
-                $do = 'blog';
-                break;
-            case 'sid':
-                $do = 'share';
-                break;
-            default:
-                return;
-        }
-        $link = $_G['siteurl'] . "home.php?mod=space&do=$do&uid={$comment[uid]}&id={$comment[id]}#comment_anchor_{$comment[cid]}";
-        $status = eze_convert($comment['message'], $_G['charset'], 'UTF-8');
-        $status = $link . ' ' . eze_filter($status);
-        $status = substr($status, 0, 1000);
-        return $status;
-    }
-
-    static function sync_doingcomment($dcid, $sync_to){
-        $comment = DB::fetch_first("SELECT id,uid,message FROM " . DB::table('home_docomment')  . " WHERE id = $dcid ");
-        $status = self::format_doingcomment_status($comment);
-        self::publish($comment['uid'], $sync_to, $status);
-    }
-
-    static function format_doingcomment_status($docomment){
-        global $_G;
-        $status = eze_convert($docomment['message'], $_G['charset'], 'UTF-8');
-        $status = substr($status, 0, 1000);
-        return $status;
-    }
+    */
 
     //将内容发布出去,所有的同步内容最终通过这个函数发布
     static function publish($uid, $sync_to, $status){
-        global $_G;
-        $eze_app_key = $_G['cache']['plugin']['ezengage']['eze_app_key'];
+        global $ezengage_config;
+        global $db;
+        $eze_app_key = $ezengage_config['app_key'];
         if(empty($eze_app_key)){
             return ;
         }
+
+        file_put_contents("/tmp/dd.txt", $status);
+        include_once realpath(dirname(__FILE__)). '/apiclient.php';
+
         $ezeApiClient = new EzEngageApiClient($eze_app_key);
         foreach($sync_to as $profile_id){
-            $row = DB::fetch_first("SELECT identity FROM " . DB::table('eze_profile') . " WHERE uid={$uid} AND pid={$profile_id}");
+            $row = $db->fetch_array($db->query("SELECT identity FROM pw_eze_profile WHERE uid={$uid} AND pid={$profile_id}"));
             if($row){
                 $ret = $ezeApiClient->updateStatus($row['identity'], $status);
             }
