@@ -30,7 +30,7 @@ if ($action == "new") {
 //end ezengage hack 
 
 
-template/footer.html  和 mode/area/template/footer.html 
+template/wind/footer.html , template/wind/showmsg.html  和 mode/area/template/footer.html 
 
 在文件末尾加入下面的代码
 
