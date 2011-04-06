@@ -45,7 +45,7 @@ else{
     }
     else {
         require_once(R_P.'hack/ezengage/common.func.php');
-        $html = "<div id='eze_footer_wrap' style=\"display:none;position:absolute;right:480px;top:45px\">"
+        $html = "<div id='eze_footer_wrap' style=\"display:none;position:absolute;right:520px;top:42px\">"
                 . eze_login_widget('tiny', 150, 54)
                 . "</div>";
         $js = sprintf(

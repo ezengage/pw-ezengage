@@ -22,7 +22,7 @@ $eze_scriptlang = array(
 
     'th_delete' => '删除',
     'th_account' => '帐号',
-    'th_network' => '网络', 
+    'th_provider' => '网络', 
     'th_sync' => '同步内容',
     'save' => '保存修改',
     'bind_more' => '绑定更多帐号',
