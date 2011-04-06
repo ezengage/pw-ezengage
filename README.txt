@@ -1,6 +1,10 @@
 ezengage plugin for phpwind 8.5
-安装指南请看
+详细安装指南请看
 http://ezengage.com/support/phpwind-plugin/
+
+上传upload 目录下的内容到服务器
+到后台安装和和配置插件.
+然后按下面的说明的修改文件.
 
 需要修改的文件
 
