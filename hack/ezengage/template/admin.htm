@@ -1,7 +1,7 @@
 ﻿<!--<?php
 include_once PrintEot('left');print <<<EOT
 -->
-<div class="mb10"><a href="$admin_file?adminjob=hackcenter">插件中心</a>&raquo; <a href="javascript:;">{$db_hackdb[ezengage][0]}</a></div>
+<div class="mb10"><a href="$admin_file?adminjob=hackcenter">$eze_scriptlang[plugin_center]</a>&raquo; <a href="javascript:;">{$db_hackdb[ezengage][0]}</a></div>
 <!--
 EOT;
 if(empty($action)){
@@ -11,32 +11,43 @@ if($ezengage_config['enable_auto_register']){
 else{
   $auto_register_N = "checked='checked'";
 }
+if($ezengage_config['open']){
+  $open_Y = "checked='checked'";
+  $open_N = "";
+}
+else{
+  $open_N = "checked='checked'";
+  $open_Y = "";
+}
+
 print <<<EOT
 -->
 <div class="nav3 mb10">
     <ul class="cc">
-      <li class="current"><a href="$basename">ezEngage设置</a></li>
+      <li class="current"><a href="$basename">$eze_scriptlang[eze_settings]</a></li>
     </ul>
 </div>
+<p style="padding:8px 0;font-size:14px;">$eze_scriptlang[config_guide]</p>
 <form action="$basename" method="post">
   <input type="hidden" name="action" value="submit" />
-  <h2 class="h1">ezEngage设置</h2>
+  <h2 class="h1">$eze_scriptlang[eze_settings]</h2>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr1 vt">
-      <td class="td1">开启自动注册</td>
+      <td class="td1">$eze_scriptlang[open_label]</td>
       <td class="td2">
       	<ul class="cc list_80 list_A">
-            <li><input type="radio" value=1 $auto_register_Y name="ezengage_config[enable_auto_register]" />开启</li>
-            <li><input type="radio" value=0 $auto_register_N name="ezengage_config[enable_auto_register]" />关闭</li>
+            <li><input type="radio" value=1 $open_Y name="ezengage_config[open]" />$eze_scriptlang[open]</li>
+            <li><input type="radio" value=0 $open_N name="ezengage_config[open]" />$eze_scriptlang[close]</li>
           </ul>
       </td>
-		  <td class="td3"><div class="help_a"></div></td>
+		  <td class="td3"><div class="help_a">$eze_scriptlang[open_help]</div></td>
     </tr>
+ 
     <tr class="tr1 vt">
         <td class="td1">App Domain</td>
         <td class="td2"><input class="input input_wb" value='$ezengage_config[app_domain]' name="ezengage_config[app_domain]" />
-        <td class="td3"><div class="help_a"> app domain</div></td>
+        <td class="td3"><div class="help_a">App Domain</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">App Id</td>
@@ -48,10 +59,25 @@ print <<<EOT
       <td class="td2"><input class="input input_wb" value='$ezengage_config[app_key]' name="ezengage_config[app_key]" />
 	  <td class="td3"><div class="help_a">App Key</div></td>
     </tr>
+    <tr class="tr1 vt">
+      <td class="td1">$eze_scriptlang[auto_register_lable]</td>
+      <td class="td2">
+      	<ul class="cc list_80 list_A">
+            <li><input type="radio" value=1 $auto_register_Y name="ezengage_config[enable_auto_register]" />$eze_scriptlang[open]</li>
+            <li><input type="radio" value=0 $auto_register_N name="ezengage_config[enable_auto_register]" />$eze_scriptlang[close]</li>
+          </ul>
+      </td>
+		  <td class="td3">
+        <div class="help_a">
+        $eze_scriptlang[auto_register_help]
+        </div>
+      </td>
+    </tr>
+
   </table>
   </div>
   <div class="mb10 tac">
-    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="btn"><span><button type="submit">$eze_scriptlang[submit]</button></span></span>
    </div>
 </form>
 <!--

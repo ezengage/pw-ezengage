@@ -1,9 +1,11 @@
 ﻿<?php
 !function_exists('adminmsg') && exit('Forbidden');
 
+require_once(R_P."hack/ezengage/lang.$db_charset.php");
+
 if (empty($action)) {
 	include_once(D_P.'data/bbscache/ezengage_config.php');
-	ifcheck($ezengage_config['open'],'open');
+	ifcheck($ezengage_config['open'], 'open');
 	include PrintHack('admin');exit;
 }elseif($action=='submit'){
 	InitGP(array('ezengage_config'),'P');

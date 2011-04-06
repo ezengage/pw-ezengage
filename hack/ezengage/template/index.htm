@@ -13,7 +13,7 @@
 EOT;
 print <<<EOT
 -->
-<em>&gt;</em><a href="$basename">我绑定的帐号</a>
+<em>&gt;</em><a href="$basename">$eze_scriptlang[my_accounts]</a>
 <!--
 EOT;
 print <<<EOT
@@ -27,40 +27,30 @@ print <<<EOT
 EOT;
 if(!$action){print <<<EOT
 -->
-				<h4 class="f14 b">用户信息</h4>
+				<h4 class="f14 b">$eze_scriptlang[user_info]</h4>
 				<ul class="mb10">
-					<li>用户名:$windid</li>
+					<li>$eze_scriptlang[user_name]:$windid</li>
 				</ul>
 <!--
 EOT;
 }print <<<EOT
 -->
-				<h4 class="f14 b">功能简介</h4>
+				<h4 class="f14 b">$eze_scriptlang[feature_intro]</h4>
 				<ul class="bank_jj" id="bank_jj">
 					<li class="current">
-						1. 绑定第三方帐号
+						1. $eze_scriptlang[bind_3rd_accounts]
 						<div class="mb10">
-							你可以绑定或者解除绑定新浪微博,腾讯微博,人人网等第三方账户。<br />
+							$eze_scriptlang[bind_3rd_accounts_detail]
+              <br/>
 						</div>
 					</li>
-					<li class="current">2. 设置同步内容
-						<div class="mb10">你可以设置那些内容同步到绑定的微博或社交网络帐号上。</div>
+					<li class="current">2. $eze_scriptlang[set_sync_list]
+						<div class="mb10">
+                $eze_scriptlang[set_sync_list_detail]
+            </div>
 					</li>
 				</ul>
 			</div>
-<!--
-<script type="text/javascript">
-var tt = li.getElementsByTagName("li");
-for(i=0; i<tt.length; i++){
-	tt[i].onclick= function(){
-		for(j=0; j<tt.length; j++){
-			tt[j].className = "";
-			this.className  = "current";
-		}
-	}
-}
-</script>
--->
 		</div>
 		<div class="content_thread cc">
 			<div class="content_ie" style="min-height:800px;_height:800px;">
@@ -70,7 +60,7 @@ if(!$action){print <<<EOT
 -->
 			<div class="hB" style="padding-left:0;">
 				<ul class="tabB cc fl mr20">
-					<li class="current"><a href="javascript:;">我绑定的账号</a></li>
+					<li class="current"><a href="javascript:;">$eze_scriptlang[my_accounts]</a></li>
 				</ul>
 			</div>
 			<div class="p15">
@@ -81,10 +71,10 @@ print <<<EOT
       <form method="post">
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<tr>
-          <td class="h" width="10%">删除</td>
-          <td class="h" width="40%"><b>帐号</b></td>
-          <td class="h" width="20%"><b>网络</b></td>
-          <td class="h" width="20%"><b>同步内容</b></td>
+          <td class="h" width="10%">$eze_scriptlang[th_delete]</td>
+          <td class="h" width="40%"><b>$eze_scriptlang[th_account]</b></td>
+          <td class="h" width="20%"><b>$eze_scriptlang[th_provider]</b></td>
+          <td class="h" width="20%"><b>$eze_scriptlang[th_sync]</b></td>
         </tr>
 <!--
 EOT;
@@ -111,7 +101,7 @@ print <<<EOT
           </td>
           <td colspan="3">
               <input type="hidden" name="action" value="save"/>
-              <input type="submit" value="保存修改"/>
+              <input type="submit" value="$eze_scriptlang[save]"/>
           </td>
         </tr>
 			</table>
@@ -124,7 +114,7 @@ $widget = eze_login_widget('normal', 350, 190);
 print <<<EOT
 -->
     <div class="p15">
-      <h4 style="margin-left:5px;">绑定更多帐号</h4>
+      <h4 style="margin-left:5px;">$eze_scriptlang[bind_more]</h4>
       <div>
         $widget
       </div>

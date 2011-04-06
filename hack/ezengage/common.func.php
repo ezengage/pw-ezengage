@@ -10,8 +10,6 @@ define(EZE_ALL_SYNC_LIST, 'thread,reply');
 define(EZE_DEFAULT_SYNC_LIST, 'thread');
 define(EZE_MY_ACCOUNT_URL, 'hack.php?H_name=ezengage');
 
-global $hack_name;
-
 //转换编码
 function eze_convert($source, $in, $out){
     $in = strtoupper($in);
@@ -99,12 +97,6 @@ function eze_register_user($profile){
 	/** @var $register PW_Register */
 
     $regname = $profile['preferred_username'];
-
-    //DON'T AUTO SET USERNAME
-    //$name_check = $db->get_value('SELECT COUNT(*) AS count FROM pw_members WHERE username LIKE ' . S::sqlEscape("$regname%"));
-    //if($name_check > 0){
-    //    $regname = $regname . "" . $name_check;
-    //}
 
 	$ret = $register->checkSameNP($regname, $regpwd);
 
@@ -197,7 +189,7 @@ function eze_login_widget_output($style = 'normal', $width = 'auto', $height = '
 }
 function eze_sync_list($profile){
     global $db_charset;
-    require(R_P."hack/ezengage/lang.$db_charset.php");
+    global $eze_scriptlang;
 
     $html = array();
     foreach(explode(',', EZE_ALL_SYNC_LIST) as $sync_item){
@@ -354,7 +346,6 @@ class eze_publisher {
             return ;
         }
 
-        file_put_contents("/tmp/dd.txt", $status);
         include_once realpath(dirname(__FILE__)). '/apiclient.php';
 
         $ezeApiClient = new EzEngageApiClient($eze_app_key);

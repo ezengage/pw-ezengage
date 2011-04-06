@@ -1,12 +1,12 @@
 <?php
-if(!$winduid){
-    Showmsg('请先登录');
-    exit();
-}
-
 require_once(D_P.'data/bbscache/ezengage_config.php');
 require_once(R_P.'hack/ezengage/common.func.php');
 require_once(R_P."hack/ezengage/lang.$db_charset.php");
+
+if(!$winduid){
+    Showmsg($eze_scriptlang['need_login']);;
+    exit();
+}
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($_POST['action'] == 'save'){
