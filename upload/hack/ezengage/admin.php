@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 !function_exists('adminmsg') && exit('Forbidden');
 
 require_once(R_P."hack/ezengage/lang.$db_charset.php");
