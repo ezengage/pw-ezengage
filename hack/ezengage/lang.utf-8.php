@@ -40,8 +40,8 @@ $eze_scriptlang = array(
     'auto_register_lable' => '自动注册',
     'auto_register_help' => '开启自动注册后，将尝试使用第三方的用户名在本站注册一个用户，如果由于重名等因素导致注册失败，会跳到手工注册页面。',
 
-    //<item id="new_bind_pm_subject"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username}]]></item>
-    //<item id="new_bind_pm_message"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username},你可以访问[url={siteurl}home.php?mod=spacecp&ac=plugin&id=ezengage:accounts]我绑定的帐号[/url]管理你的帐号和调整希望同步的内容。]]></item>
+    'new_bind_pm_subject' => '您已成功绑定%(provider_name)s帐号%(preferred_username)s',
+    'new_bind_pm_message' => '您已成功绑定%(provider_name)s帐号%(preferred_username)s,你可以访问[url=%(db_bbsurl)s/hack.php?H_name=ezengage]我绑定的帐号[/url]管理你的帐号和调整希望同步的内容。',
 );
 ?>
 

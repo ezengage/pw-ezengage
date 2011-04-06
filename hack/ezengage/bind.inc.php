@@ -40,7 +40,7 @@ else{
     else{
         //如果当前已经有phpwind 用户登录了,将eze 用户绑定到该用户
         if($winduid) {
-            eze_bind($winduid, $profile);
+            eze_bind($winduid, $profile, True);
             Cookie('eze_token', '', 0);
             header("location: ". EZE_MY_ACCOUNT_URL);
         }

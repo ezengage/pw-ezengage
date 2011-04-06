@@ -233,13 +233,31 @@ function eze_get_profiles($uid){
 }
 
 function eze_bind($winduid, $profile, $send_pm = FALSE){
-    global $db;
+    global $db,$db_bbsurl;
+    global $eze_scriptlang;
     if($winduid && $profile && !$profile['uid']){
         $ret = $db->query(sprintf(
             "UPDATE pw_eze_profile SET uid = %d WHERE pid = %d",
             $winduid, $profile['pid']
         ));
         Cookie('eze_token', '', 0);
+        if($send_pm){
+            $data = array(
+                '%(provider_name)s' => $profile['provider_name'],
+                '%(preferred_username)s' => $profile['preferred_username'],
+                '%(db_bbsurl)s' => $db_bbsurl,
+            );
+            $title = str_replace(array_keys($data), array_values($data), $eze_scriptlang['new_bind_pm_subject']);
+            $content = str_replace(array_keys($data), array_values($data), $eze_scriptlang['new_bind_pm_message']);
+            $windid = $db->get_value("SELECT username from pw_members WHERE uid = $winduid");
+            M::sendNotice(
+                array($windid),
+                array(
+                    'title' => $title,
+                    'content' => $content,
+                )
+            );
+        }
     }
 }
 
