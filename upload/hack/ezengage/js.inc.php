@@ -20,23 +20,53 @@ else{
             echo "window.location.href='register.php';";
         }
     }
-    elseif($_GET['scr'] == 'register'){
+    elseif($_GET['scr'] == 'register' || $_GET['scr'] == 'login'){
         require_once(R_P. 'hack/ezengage/common.func.php');
         require_once(R_P. "hack/ezengage/lang.$db_charset.php");
         $profile = eze_current_profile();
         $is_auto_register_error = GetCookie('eze_auto_register_error');
         //auto register fail or disabled
-        if($profile && ($is_auto_register_error || !$ezengage_config['enable_auto_register'])){
-            $html = $eze_scriptlang['register_notice'];
-            foreach(array('provider_name', 'preferred_username') as $item){
-                $html = str_replace('%(' . $item .  ')s', $profile[$item], $html);
+        if($profile){
+            if($_GET['scr'] == 'register' && ($is_auto_register_error || !$ezengage_config['enable_auto_register'])){
+                $html = $eze_scriptlang['register_notice'];
+                foreach(array('provider_name', 'preferred_username') as $item){
+                    $html = str_replace('%(' . $item .  ')s', $profile[$item], $html);
+                }
+                $js = "try{
+                    var h5  = document.getElementsByTagName('h5').item(0);
+                    h5.innerHTML = '$html';
+                }
+                catch(e){
+                }";
+                echo $js;
             }
-            $js = "try{
-                var h5  = document.getElementsByTagName('h5').item(0);
-                h5.innerHTML = '$html';
-            }
-            catch(e){
-            }";
+        }
+        else{
+            $html = "<div id='eze_footer_wrap' style=\"display:none;padding-left:20px\">"
+                    . eze_login_widget('medium', 150, 300)
+                    . "</div>";
+            $js = sprintf(
+                "try{
+                var _eze_html = '%s';
+                var _ele = document.createElement('div');
+                _ele.innerHTML = _eze_html;
+                document.body.appendChild(_ele);
+                var _eze_login = document.getElementById('eze_footer_wrap');
+                var divs = document.getElementsByTagName('div');
+                var target = null;
+                for(var i = 0; i < divs.length; ++ i){
+                    var div = divs.item(i); 
+                    if(div.className.indexOf('regLogin') >= 0){
+                        target = div;
+                        break;
+                    }
+                }
+                target.appendChild(_eze_login); 
+                _eze_login.style.display = '';
+                }catch(e){}
+                ",
+                addslashes($html)
+            );
             echo $js;
         }
     }

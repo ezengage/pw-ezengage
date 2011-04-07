@@ -170,7 +170,7 @@ function eze_login_widget($style = 'normal', $width = 'auto', $height = 'auto'){
     $eze_options = $ezengage_config;
 
     $token_cb = $site_url . '/ezengage.php?mod=token';
-    if(in_array($style, array('normal','medium','small', 'tiny'))){
+    if(in_array($style, array('normal', 'medium', 'small', 'tiny'))){
         $html = sprintf('<iframe class="eze_widget" border="0" src="http://%s.ezengage.net/login/%s/widget/%s?token_cb=%s&w=%s&h=%s" scrolling="no" frameBorder="no" style="width:%s;height:%s;"></iframe>', 
                $eze_options['app_domain'],
                $eze_options['app_domain'],
