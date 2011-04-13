@@ -75,9 +75,9 @@ else{
     }
     else {
         require_once(R_P.'hack/ezengage/common.func.php');
-        $html = "<div id='eze_footer_wrap' style=\"display:none;position:absolute;right:520px;top:42px\">"
+        $html = "<span id='eze_footer_wrap' style=\"display:none;float:left;padding-left:300px;margin-top:15px;\">"
                 . eze_login_widget('tiny', 150, 54)
-                . "</div>";
+                . "</span>";
         $js = sprintf(
             "try{
             var _eze_html = '%s';
@@ -88,7 +88,7 @@ else{
             var _form = _banner.getElementsByTagName('form').item(0);    
             _eze_login = document.getElementById('eze_footer_wrap');
             _banner.insertBefore(_eze_login, _form); 
-            _eze_login.style.display = '';
+            _eze_login.style.display = 'inline';
             }catch(e){}
             ",
             addslashes($html)
