@@ -1,4 +1,4 @@
-ezengage plugin for phpwind 8.5  v0.1.4
+ezengage plugin for phpwind 8.3 v0.1.5
 详细安装指南请看
 http://ezengage.com/support/phpwind-plugin/
 
