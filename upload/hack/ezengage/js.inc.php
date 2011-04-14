@@ -63,6 +63,14 @@ else{
                 }
                 target.appendChild(_eze_login); 
                 _eze_login.style.display = '';
+                var divs = target.getElementsByTagName('div');
+                for(var i = 0; i < divs.length; ++i){
+                    var div = divs.item(i);
+                    if(div.className.indexOf('regForm-wrap') >= 0){
+                        div.style.paddingBottom = '10px';
+                        break;
+                    }
+                }
                 }catch(e){}
                 ",
                 addslashes($html)
