@@ -96,7 +96,7 @@ function eze_register_user($profile){
 	$register = L::loadClass('Register', 'user');
 	/** @var $register PW_Register */
 
-    $regname = $profile['preferred_username'];
+    $regname = strtolower($profile['preferred_username']);
 
 	$ret = $register->checkSameNP($regname, $regpwd);
 
